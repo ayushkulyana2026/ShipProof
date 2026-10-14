@@ -1,0 +1,35 @@
+{
+  "courier": "Delhivery",
+  "originPincode": "122016",
+  "volumetricDivisor": 5000,
+  "firstSlabKg": 0.5,
+  "additionalSlabKg": 0.5,
+  "rates": {
+    "A": {
+      "firstSlab": 32,
+      "additionalSlab": 30
+    },
+    "B": {
+      "firstSlab": 38,
+      "additionalSlab": 34
+    },
+    "C": {
+      "firstSlab": 45,
+      "additionalSlab": 40
+    },
+    "D": {
+      "firstSlab": 52,
+      "additionalSlab": 48
+    },
+    "E": {
+      "firstSlab": 68,
+      "additionalSlab": 62
+    }
+  },
+  "rtoRule": "same_as_forward",
+  "codFixed": 35,
+  "codPercent": 1.75,
+  "fuelSurchargePercent": 8,
+  "gstPercent": 18,
+  "tolerancePercent": 10
+}

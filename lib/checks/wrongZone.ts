@@ -31,7 +31,7 @@ export function checkWrongZone(ctx: ShipmentContext): Finding | null {
     expected: `Zone ${z.expectedZone} (${ZONE_LABELS[z.expectedZone]})`,
     billed: `Zone ${z.billedZone} (${ZONE_LABELS[z.billedZone]})`,
     explain: (amount) =>
-      `AWB ${ctx.awb} to pincode ${pin} was billed as Zone ${z.billedZone} but is Zone ${z.expectedZone} (${ctx.zoneReason.toLowerCase()}) under our rate card, an excess of ${formatINR(amount)}.`,
+      `AWB ${ctx.awb} to pincode ${pin} was billed as Zone ${z.billedZone} but is Zone ${z.expectedZone} under our rate card (${ctx.zoneReason.charAt(0).toLowerCase() + ctx.zoneReason.slice(1)}), an excess of ${formatINR(amount)}.`,
     working: [
       `Expected zone: ${z.expectedZone} — ${ctx.zoneReason}`,
       `Billed zone: ${z.billedZone}`,

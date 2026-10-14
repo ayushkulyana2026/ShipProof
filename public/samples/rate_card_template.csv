@@ -1,0 +1,6 @@
+courier,origin_pincode,zone,first_slab_rate,additional_slab_rate,first_slab_kg,additional_slab_kg,volumetric_divisor,cod_fixed,cod_percent,fuel_surcharge_percent,gst_percent,rto_rule,rto_value,tolerance_percent
+Delhivery,122016,A,32,30,0.5,0.5,5000,35,1.75,8,18,same_as_forward,,10
+Delhivery,122016,B,38,34,0.5,0.5,5000,35,1.75,8,18,same_as_forward,,10
+Delhivery,122016,C,45,40,0.5,0.5,5000,35,1.75,8,18,same_as_forward,,10
+Delhivery,122016,D,52,48,0.5,0.5,5000,35,1.75,8,18,same_as_forward,,10
+Delhivery,122016,E,68,62,0.5,0.5,5000,35,1.75,8,18,same_as_forward,,10

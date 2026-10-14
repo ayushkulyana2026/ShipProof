@@ -1,0 +1,275 @@
+{
+  "description": "Every billing error planted in the sample invoice. The audit must find all of these and nothing else.",
+  "courier": "Delhivery",
+  "originPincode": "122016",
+  "shipments": 200,
+  "invoiceLines": 232,
+  "counts": {
+    "WEIGHT_OVERCHARGE": 12,
+    "WRONG_ZONE": 6,
+    "COD_ON_PREPAID": 4,
+    "RTO_WITHOUT_RETURN": 3,
+    "COD_WRONG_AMOUNT": 3,
+    "RTO_WRONG_RATE": 2,
+    "DUPLICATE_AWB": 2,
+    "UNMATCHED_AWB": 2
+  },
+  "totalOvercharge": 2785,
+  "overchargeByAwb": {
+    "143265100299": 61.17,
+    "143265100934": 76.47,
+    "143265101582": 50.98,
+    "143265101941": 122.34,
+    "143265102318": 50.98,
+    "143265102665": 122.35,
+    "143265103062": 50.98,
+    "143265103405": 86.66,
+    "143265103738": 56.07,
+    "143265103831": 41.3,
+    "143265104126": 91.76,
+    "143265104181": 41.3,
+    "143265104331": 79.01,
+    "003265104493": 67.54,
+    "143265104723": 127.44,
+    "143265104838": 131.27,
+    "143265105077": 41.3,
+    "143265105121": 93.04,
+    "143265105356": 17.7,
+    "143265105486": 91.76,
+    "143265105557": 122.34,
+    "143265105610": 127.44,
+    "143265105708": 32.99,
+    "143265105742": 38.23,
+    "143265105959": 41.3,
+    "143265106192": 61.17,
+    "003265106607": 27.37,
+    "143265106652": 38.23,
+    "143265107341": 101.95,
+    "14999990000101": 0,
+    "14999990000102": 0,
+    "143265103630": 193.71,
+    "143265104009": 498.85
+  },
+  "planted": [
+    {
+      "awb": "143265100299",
+      "orderId": "#SP1009",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 1.22 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265100934",
+      "orderId": "#SP1026",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.96 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265101582",
+      "orderId": "#SP1043",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.74 kg, billed 1.5 kg"
+    },
+    {
+      "awb": "143265101941",
+      "orderId": "#SP1053",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.48 kg, billed 1.5 kg"
+    },
+    {
+      "awb": "143265102318",
+      "orderId": "#SP1063",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 1.48 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265102665",
+      "orderId": "#SP1073",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 1.92 kg, billed 3 kg"
+    },
+    {
+      "awb": "143265103062",
+      "orderId": "#SP1083",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.6 kg, billed 1.5 kg"
+    },
+    {
+      "awb": "143265103405",
+      "orderId": "#SP1093",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.73 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265103738",
+      "orderId": "#SP1102",
+      "type": "WRONG_ZONE",
+      "note": "true zone D, billed E"
+    },
+    {
+      "awb": "143265103831",
+      "orderId": "#SP1104",
+      "type": "COD_ON_PREPAID",
+      "note": "₹35 COD fee on a prepaid order"
+    },
+    {
+      "awb": "143265104126",
+      "orderId": "#SP1112",
+      "type": "WRONG_ZONE",
+      "note": "true zone D, billed E"
+    },
+    {
+      "awb": "143265104181",
+      "orderId": "#SP1114",
+      "type": "COD_ON_PREPAID",
+      "note": "₹35 COD fee on a prepaid order"
+    },
+    {
+      "awb": "143265104331",
+      "orderId": "#SP1118",
+      "type": "RTO_WITHOUT_RETURN",
+      "note": "RTO billed on a delivered order"
+    },
+    {
+      "awb": "003265104493",
+      "orderId": "#SP1122",
+      "type": "WRONG_ZONE",
+      "note": "true zone A, billed C"
+    },
+    {
+      "awb": "143265104723",
+      "orderId": "#SP1128",
+      "type": "RTO_WITHOUT_RETURN",
+      "note": "RTO billed on a delivered order"
+    },
+    {
+      "awb": "143265104838",
+      "orderId": "#SP1131",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.89 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265104838",
+      "orderId": "#SP1131",
+      "type": "WRONG_ZONE",
+      "note": "true zone A, billed C"
+    },
+    {
+      "awb": "143265105077",
+      "orderId": "#SP1138",
+      "type": "COD_ON_PREPAID",
+      "note": "₹35 COD fee on a prepaid order"
+    },
+    {
+      "awb": "143265105121",
+      "orderId": "#SP1139",
+      "type": "WRONG_ZONE",
+      "note": "true zone A, billed C"
+    },
+    {
+      "awb": "143265105356",
+      "orderId": "#SP1145",
+      "type": "COD_WRONG_AMOUNT",
+      "note": "billed 50, agreed 35"
+    },
+    {
+      "awb": "143265105486",
+      "orderId": "#SP1149",
+      "type": "WRONG_ZONE",
+      "note": "true zone D, billed E"
+    },
+    {
+      "awb": "143265105557",
+      "orderId": "#SP1151",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 0.85 kg, billed 2 kg"
+    },
+    {
+      "awb": "143265105610",
+      "orderId": "#SP1152",
+      "type": "RTO_WITHOUT_RETURN",
+      "note": "RTO billed on a delivered order"
+    },
+    {
+      "awb": "143265105708",
+      "orderId": "#SP1155",
+      "type": "COD_WRONG_AMOUNT",
+      "note": "billed 93.18, agreed 65.22"
+    },
+    {
+      "awb": "143265105742",
+      "orderId": "#SP1156",
+      "type": "RTO_WRONG_RATE",
+      "note": "RTO billed 136, allowed 106"
+    },
+    {
+      "awb": "143265105959",
+      "orderId": "#SP1162",
+      "type": "COD_ON_PREPAID",
+      "note": "₹35 COD fee on a prepaid order"
+    },
+    {
+      "awb": "143265106192",
+      "orderId": "#SP1168",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 1.26 kg, billed 2 kg"
+    },
+    {
+      "awb": "003265106607",
+      "orderId": "#SP1179",
+      "type": "COD_WRONG_AMOUNT",
+      "note": "billed 77.33, agreed 54.13"
+    },
+    {
+      "awb": "143265106652",
+      "orderId": "#SP1180",
+      "type": "RTO_WRONG_RATE",
+      "note": "RTO billed 155, allowed 125"
+    },
+    {
+      "awb": "143265107341",
+      "orderId": "#SP1199",
+      "type": "WEIGHT_OVERCHARGE",
+      "note": "chargeable 1.83 kg, billed 3 kg"
+    },
+    {
+      "awb": "143265103630",
+      "orderId": "#SP1099",
+      "type": "DUPLICATE_AWB",
+      "note": "forward line billed twice"
+    },
+    {
+      "awb": "143265104009",
+      "orderId": "#SP1109",
+      "type": "DUPLICATE_AWB",
+      "note": "forward line billed twice"
+    },
+    {
+      "awb": "14999990000101",
+      "type": "UNMATCHED_AWB",
+      "note": "AWB not present in Shopify export"
+    },
+    {
+      "awb": "14999990000102",
+      "type": "UNMATCHED_AWB",
+      "note": "AWB not present in Shopify export"
+    }
+  ],
+  "mustNotFlag": [
+    {
+      "awb": "143265104888",
+      "why": "billed weight 5% above chargeable: crosses a slab but is within the 10% tolerance"
+    },
+    {
+      "awb": "143265105257",
+      "why": "billed weight 5% above chargeable: crosses a slab but is within the 10% tolerance"
+    },
+    {
+      "awb": "143265105624",
+      "why": "billed weight 5% above chargeable: crosses a slab but is within the 10% tolerance"
+    },
+    {
+      "awb": "143265105815",
+      "why": "billed a cheaper zone (C instead of D)"
+    }
+  ]
+}
