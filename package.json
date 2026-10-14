@@ -1,0 +1,42 @@
+{
+  "name": "shipproof",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build:pincodes": "tsx scripts/build-pincodes.ts",
+    "generate:samples": "tsx scripts/generate-samples.ts"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "1.1.15",
+    "@radix-ui/react-slot": "1.2.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.544.0",
+    "next": "15.5.27",
+    "papaparse": "5.5.3",
+    "react": "19.1.9",
+    "react-dom": "19.1.9",
+    "tailwind-merge": "3.3.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.6",
+    "@types/papaparse": "5.3.16",
+    "@types/react": "19.1.13",
+    "@types/react-dom": "19.1.9",
+    "autoprefixer": "10.4.21",
+    "postcss": "8.5.6",
+    "tailwindcss": "3.4.19",
+    "tailwindcss-animate": "1.0.7",
+    "tsx": "4.20.5",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}
