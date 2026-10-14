@@ -8,3 +8,4 @@ next-env.d.ts
 .vercel
 # Raw India Post CSV (large); only the preprocessed chunks in data/pincodes are committed
 data/raw/
+tests-ui/screenshots/

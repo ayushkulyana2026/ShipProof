@@ -4,6 +4,7 @@
   "originPincode": "122016",
   "shipments": 200,
   "invoiceLines": 232,
+  "invoiceTotal": 58390.54,
   "counts": {
     "WEIGHT_OVERCHARGE": 12,
     "WRONG_ZONE": 6,

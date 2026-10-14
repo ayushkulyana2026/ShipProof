@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build:pincodes": "tsx scripts/build-pincodes.ts",
-    "generate:samples": "tsx scripts/generate-samples.ts"
+    "generate:samples": "tsx scripts/generate-samples.ts",
+    "test:ui": "node tests-ui/smoke.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.15",
@@ -32,11 +33,15 @@
     "@types/react": "19.1.13",
     "@types/react-dom": "19.1.9",
     "autoprefixer": "10.4.21",
+    "playwright": "1.55.1",
     "postcss": "8.5.6",
     "tailwindcss": "3.4.19",
     "tailwindcss-animate": "1.0.7",
     "tsx": "4.20.5",
     "typescript": "5.9.3",
     "vitest": "3.2.7"
+  },
+  "engines": {
+    "node": ">=18.18"
   }
 }

@@ -111,3 +111,10 @@ describe("sample data end-to-end", () => {
     }
   });
 });
+
+describe("sample metadata", () => {
+  it("invoice total in expected results matches the audit", () => {
+    const e = expected as Expected & { invoiceTotal: number };
+    expect(result.invoiceTotal).toBe(e.invoiceTotal);
+  });
+});

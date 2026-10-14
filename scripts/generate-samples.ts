@@ -13,6 +13,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import * as XLSX from "xlsx";
 
 type Zone = "A" | "B" | "C" | "D" | "E";
 type PlantedType =
@@ -302,6 +303,16 @@ lines.forEach((l, i) => {
 });
 fs.writeFileSync(path.join(OUT, "sample_invoice_delhivery.csv"), toCsv(invoiceRows));
 
+// Same invoice as Excel, with AWBs stored as text cells (as couriers' portals export them) to exercise the .xlsx path.
+const ws = XLSX.utils.aoa_to_sheet(invoiceRows.map((r) => r.map((v, c) => (c === 0 ? String(v) : typeof v === "string" && /^\d+(\.\d+)?$/.test(v) ? Number(v) : v))));
+for (let r = 1; r < invoiceRows.length; r++) {
+  const ref = XLSX.utils.encode_cell({ r, c: 0 });
+  if (ws[ref]) ws[ref].t = "s";
+}
+const wb = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(wb, ws, "Invoice");
+fs.writeFileSync(path.join(OUT, "sample_invoice_delhivery.xlsx"), XLSX.write(wb, { type: "buffer", bookType: "xlsx" }));
+
 const PAY = { COD: "Cash on Delivery (COD)", Prepaid: "Razorpay Secure (UPI, Cards, Wallets, NetBanking)" };
 const orderRows: (string | number)[][] = [
   ["Name", "Created at", "Tracking Number", "Shipping Zip", "Payment Method", "Total", "Weight (kg)", "Length (cm)", "Width (cm)", "Height (cm)", "Delivery Status"],
@@ -310,6 +321,20 @@ for (const o of orders) {
   orderRows.push([o.orderId, `${o.date} 10:15:00 +0530`, o.awb, o.pincode, PAY[o.payment], o.value >= 1000 ? `₹${o.value.toLocaleString("en-IN")}.00` : `${o.value}.00`, o.weight, o.box[0], o.box[1], o.box[2], o.status]);
 }
 fs.writeFileSync(path.join(OUT, "sample_shopify_orders.csv"), toCsv(orderRows));
+
+// Tester file: the first 60 invoice lines in a different courier's layout (Shiprocket-style headers,
+// weight in grams, "Rs." amounts, uppercase headers) plus two broken rows. Audit it against
+// sample_shopify_orders.csv to check auto-mapping and error reporting.
+const edgeRows: (string | number)[][] = [
+  ["WAYBILL NO", "COURIER NAME", "MOVEMENT TYPE", "APPLIED WEIGHT (GMS)", "ZONE NAME", "FORWARD CHARGES", "COD FEE", "FSC", "OTHER CHARGES", "IGST", "GRAND TOTAL", "MANIFEST DATE"],
+];
+lines.slice(0, 60).forEach((l) => {
+  edgeRows.push([l.awb, COURIER, l.type === "RTO" ? "RTO" : "FWD", Math.round(l.weight * 1000), l.zone, `Rs. ${l.freight.toFixed(2)}`, l.cod ? `Rs. ${l.cod.toFixed(2)}` : "-", l.fuel.toFixed(2), "0", l.gst.toFixed(2), `Rs. ${l.total.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`, l.date]);
+});
+edgeRows.push(["1.43265E+11", COURIER, "FWD", 500, "B", "Rs. 38.00", "-", "3.04", "0", "7.39", "Rs. 48.43", "2026-09-30"]);
+edgeRows.push(["14999990000999", COURIER, "FWD", "half kg", "B", "Rs. 38.00", "-", "3.04", "0", "7.39", "Rs. 48.43", "2026-09-30"]);
+edgeRows.push(["", "", "", "", "", "", "", "", "", "", "Rs. 9,999.00", "TOTAL"]);
+fs.writeFileSync(path.join(OUT, "tester_shiprocket_style_invoice.csv"), toCsv(edgeRows));
 
 fs.writeFileSync(path.join(OUT, "sample_rate_card.json"), JSON.stringify(RATE_CARD, null, 2) + "\n");
 
@@ -329,6 +354,7 @@ const expected = {
   originPincode: ORIGIN,
   shipments: N,
   invoiceLines: lines.length,
+  invoiceTotal: r2(lines.reduce((a, l) => a + l.total, 0)),
   counts,
   totalOvercharge: r2(Object.values(perAwb).reduce((a, b) => a + b, 0)),
   overchargeByAwb: perAwb,

@@ -153,3 +153,18 @@ describe("rate card import", () => {
     expect(() => parseRateCardCsv("courier,origin_pincode,zone,first_slab_rate,additional_slab_rate\nX,122016,A,30,30\n")).toThrow(/missing zone/);
   });
 });
+
+describe("Excel", () => {
+  it("reads the .xlsx sample identically to the CSV, keeping text AWBs", async () => {
+    const { readExcel } = await import("@/lib/parsing/read");
+    const samples = path.join(__dirname, "../public/samples");
+    const buf = fs.readFileSync(path.join(samples, "sample_invoice_delhivery.xlsx"));
+    const xlsx = await readExcel(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer, "sample.xlsx");
+    const csv = readCsvText(fs.readFileSync(path.join(samples, "sample_invoice_delhivery.csv"), "utf8"));
+    const a = normalizeInvoice(xlsx, autoMap(xlsx.headers, INVOICE_FIELDS), { courier: "Delhivery" });
+    const b = normalizeInvoice(csv, autoMap(csv.headers, INVOICE_FIELDS), { courier: "Delhivery" });
+    expect(a.errors).toEqual([]);
+    expect(a.rows.map(({ sourceRow: _s, ...r }) => r)).toEqual(b.rows.map(({ sourceRow: _s, ...r }) => r));
+    expect(a.rows.some((r) => r.awb.startsWith("00"))).toBe(true);
+  });
+});
