@@ -9,3 +9,7 @@ next-env.d.ts
 # Raw India Post CSV (large); only the preprocessed chunks in data/pincodes are committed
 data/raw/
 tests-ui/screenshots/
+launch-video/renders/still-*.png
+launch-video/renders/*-sheet.png
+launch-video/renders/*.wav
+launch-video/renders/log.txt
