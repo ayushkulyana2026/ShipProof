@@ -11,18 +11,23 @@
     "test:watch": "vitest",
     "build:pincodes": "tsx scripts/build-pincodes.ts",
     "generate:samples": "tsx scripts/generate-samples.ts",
-    "test:ui": "node tests-ui/smoke.mjs"
+    "test:ui": "node tests-ui/smoke.mjs",
+    "db:migrate": "tsx scripts/db-migrate.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.1.15",
     "@radix-ui/react-slot": "1.2.3",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "dodopayments": "2.55.0",
     "lucide-react": "0.544.0",
     "next": "15.5.27",
     "papaparse": "5.5.3",
+    "postgres": "3.4.9",
     "react": "19.1.9",
     "react-dom": "19.1.9",
+    "server-only": "0.0.1",
+    "standardwebhooks": "1.1.1",
     "tailwind-merge": "3.3.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "3.25.76"

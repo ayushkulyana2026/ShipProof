@@ -18,7 +18,7 @@ ShipProof audits Indian D2C shipping invoices. Upload a courier invoice (Shiproc
 
 The output is a total "money you can recover" figure, a filterable per-AWB issue table where every row expands to show its full working, and per-courier dispute CSVs and emails.
 
-**Privacy:** every file is parsed and audited in the browser. Nothing is uploaded, stored or sent anywhere. There's no backend, no database and no analytics, and a `connect-src 'self'` Content-Security-Policy makes the browser block any attempt to send data to another origin.
+**Privacy:** every file is parsed and audited in the browser. Invoices, orders and audit results are never uploaded, stored or sent anywhere, and a `connect-src 'self'` Content-Security-Policy makes the browser block any attempt to send data to another origin. The small backend (below) only handles emails and billing: sign-ups, Dodo Payments checkout and payment webhooks.
 
 **Accuracy:** all money maths is deterministic TypeScript in `lib/engine` (no LLM anywhere), rounded to paise at each step. The main acceptance test (`tests/e2e-sample.test.ts`) runs the full pipeline on sample data with 34 planted errors and asserts that exactly those are found, with nothing extra flagged.
 
@@ -36,7 +36,8 @@ npm run dev            # http://localhost:3000
 Other scripts:
 
 ```bash
-npm test               # 85 unit + end-to-end engine tests (Vitest)
+npm test               # engine, parsing, report, e2e and backend tests (Vitest)
+npm run db:migrate     # apply the Postgres schema (DATABASE_URL=...)
 npm run typecheck      # tsc --noEmit (strict)
 npm run build && npm start      # production build on http://localhost:3000
 npm run test:ui        # browser smoke test against a running server (see TESTING.md)
@@ -44,9 +45,40 @@ npm run generate:samples        # regenerate public/samples (deterministic)
 npm run build:pincodes -- path/to/india_post.csv   # rebuild data/pincodes from the India Post CSV
 ```
 
+## Backend
+
+The pages are static. A few Next.js route handlers run on the server (Node runtime) for sales and billing only:
+
+| Endpoint | What it does | Needs |
+|---|---|---|
+| `GET /api/health` | Status of database, payments and webhooks (no secrets). 503 if the database is unreachable | none |
+| `POST /api/leads` | "Talk to us" / waitlist sign-ups → `leads` table. Same-origin only, 5 requests/min per IP, honeypot, Zod-validated | `DATABASE_URL` |
+| `POST /api/checkout` | `{ plan: "monthly", email }` → Dodo Payments hosted checkout session → `{ checkoutUrl }`; recorded in `checkout_sessions` | `DODO_PAYMENTS_API_KEY`, `DODO_PRODUCT_ID_MONTHLY` |
+| `POST /api/webhooks/dodo` | Verifies the Standard Webhooks signature on the raw body (5-min replay window), stores each delivery once (`webhook-id`), and syncs `subscriptions` / `payments` in one transaction. Older events never overwrite newer state | `DODO_PAYMENTS_WEBHOOK_KEY`, `DATABASE_URL` |
+
+How it behaves:
+
+- **Missing config fails safely.** Each endpoint answers 503 with a clear message when its configuration is missing. The pricing section then falls back from checkout to a waitlist form, and webhooks fail closed (they're rejected rather than trusted).
+- **Test mode by default.** Dodo stays in `test_mode` unless `DODO_PAYMENTS_ENVIRONMENT=live_mode` is set explicitly, so a missing variable can't charge real cards.
+- **The redirect isn't proof of payment.** The checkout return page (`/checkout/success`) only shows a message; the webhook is what confirms a subscription.
+- **Storage is Postgres via `postgres`.** It uses one connection per instance, works with poolers, and creates its tables on first use or via `npm run db:migrate`. Without `DATABASE_URL`, development uses an in-memory store; production has no store and those endpoints return 503.
+- **Rate limits are per instance.** On serverless that's best-effort, so add Vercel WAF rules for stronger limits.
+
+Code lives in `lib/server/` (env, store, Dodo, handlers, webhook event mapping) and `app/api/*/route.ts` (thin wrappers). Tests are in `tests/backend.test.ts`, plus `tests/postgres.test.ts` against a real database when `TEST_DATABASE_URL` is set.
+
+### Turning the backend on (Vercel)
+
+1. **Database:** in the Vercel project go to **Storage → Create Database → Neon (Postgres)** and connect it. This sets `DATABASE_URL` for you.
+2. **Dodo Payments:** in the Dodo dashboard (test mode first), create a subscription product (e.g. ₹1,999/month) and copy its `pdt_…` ID. Create an API key, and add a webhook pointing to `https://<your-domain>/api/webhooks/dodo` with the `subscription.*` and `payment.*` events, then copy the signing secret.
+3. **Environment variables:** in Vercel go to **Settings → Environment Variables** and add `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `DODO_PRODUCT_ID_MONTHLY`, `DODO_PAYMENTS_ENVIRONMENT=test_mode` and `APP_URL`. Then redeploy.
+4. **Check:** open `/api/health`. It should show `database.status: "ok"`, `payments.configured: true` and `webhooks.configured: true`. Make a test-card purchase and check the `subscriptions` table.
+5. **Go live:** switch to live keys and set `DODO_PAYMENTS_ENVIRONMENT=live_mode`.
+
+See `.env.example` for every variable.
+
 ## Deploy to Vercel
 
-The app is fully static (every route is prerendered) and needs **no environment variables**.
+The pages are prerendered and the API routes deploy as serverless functions automatically. With no environment variables the site and the audit work fully; sign-ups and payments switch on once the variables above are set.
 
 **Option A: Git integration (recommended)**
 1. Push this repo to GitHub.
@@ -118,9 +150,9 @@ When one AWB has several issues (e.g. wrong weight **and** wrong zone), the comp
 16. When an invoice has a courier with no rate card and only one rate card exists, that card is used (and listed under Assumptions). With several rate cards, that courier is skipped.
 17. AWBs are matched case-insensitively with spaces removed, and leading zeros are kept. AWBs that Excel has turned into scientific notation (`1.43E+11`) are rejected with a clear message, because their digits are lost.
 18. **Severity:** clear-cut errors (duplicate, RTO on a delivered order, COD on prepaid) are high; anything ≥ ₹100 is high; ≥ ₹20 is medium; otherwise low. Unmatched AWBs are low.
-19. **No persistence:** uploads and results live only in the tab's memory and vanish on refresh. Only Settings (zone rules, tolerance, divisor) are saved, in `localStorage`.
+19. **No persistence of audit data:** uploads and results live only in the tab's memory and vanish on refresh. Only Settings (zone rules, tolerance, divisor) are saved, in `localStorage`. The server stores only lead details, checkout sessions, subscriptions, payments and webhook events.
 20. **Sample data:** origin is Gurugram 122016, and the rates are typical surface B2C rates (illustrative, not any courier's real tariff).
 
 ## Out of scope (v1)
 
-No login, payments, database, PDF parsing (see the `lib/parsing/pdf.ts` interface and TODO), Shopify/courier API integrations, or automatic email sending.
+No login or accounts, PDF parsing (see the `lib/parsing/pdf.ts` interface and TODO), Shopify/courier API integrations, or automatic email sending.

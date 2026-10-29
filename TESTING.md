@@ -54,3 +54,18 @@ npm run test:ui          # Playwright: 19 checks across landing, sample results,
 `test:ui` uses `BASE_URL` (default `http://localhost:3000`). Set `CHROMIUM_PATH` if Playwright's own browser isn't installed. Screenshots go to `tests-ui/screenshots/`.
 
 The main acceptance check is `tests/e2e-sample.test.ts`. It takes the raw sample CSVs through auto column mapping, parsing and the audit, and asserts that every planted error is found and nothing else is flagged, with per-AWB amounts within ₹0.05 of the independently computed answer key.
+
+## Backend
+
+| # | Steps | Expected result |
+|---|---|---|
+| B1 | `GET /api/health` | JSON with `database`, `payments`, `webhooks` status; no secrets |
+| B2 | Landing → Pricing → **Talk to us**, submit an invalid email, then a valid one | "Enter a valid email address.", then "Thanks! We'll be in touch…"; a row in `leads` |
+| B3 | Monthly card → enter email → **Start monthly audits** (payments not configured) | Switches to "Reserve my spot" with the email prefilled; submitting stores a `monthly` lead |
+| B4 | Same, with Dodo test keys configured | Redirects to Dodo's test checkout; after paying with a test card you land on `/checkout/success` and a `subscriptions` row appears (via webhook) |
+| B5 | `curl -X POST /api/leads` with `Origin: https://evil.com` | 403 `forbidden_origin` |
+| B6 | Six lead submissions within a minute from one IP | The sixth returns 429 |
+| B7 | `curl -X POST /api/webhooks/dodo` without signature headers | 401 `invalid_signature` |
+
+Automated: `tests/backend.test.ts` (24 tests: validation, origin checks, rate limits, checkout, signature verification, replay window, idempotency, out-of-order events, rollback). For the real-database tests run
+`TEST_DATABASE_URL=postgres://postgres@localhost:5432/shipproof_test npm test` (it drops and recreates ShipProof tables in that database).

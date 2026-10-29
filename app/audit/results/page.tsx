@@ -152,6 +152,18 @@ export default function ResultsPage() {
       </div>
 
       <AssumptionsPanel a={result.assumptions} />
+
+      <Card>
+        <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold">Couriers make these mistakes every month.</p>
+            <p className="text-sm text-muted-foreground">Audit every invoice automatically and track what you recover.</p>
+          </div>
+          <Button asChild>
+            <Link href="/#pricing">See monthly plans</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

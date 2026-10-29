@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, FileSpreadsheet, Lock, Mail, Scale, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TrySampleButton } from "@/components/try-sample-button";
+import { Pricing } from "@/components/pricing";
 import { runAudit } from "@/lib/checks/audit";
 import { formatINR } from "@/lib/engine/money";
 import { prepareFromText } from "@/lib/pipeline";
@@ -148,6 +149,8 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      <Pricing />
 
       <section className="container max-w-6xl py-16 text-center">
         <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Find out in 2 minutes.</h2>
