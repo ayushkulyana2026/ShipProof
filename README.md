@@ -18,6 +18,8 @@ ShipProof audits Indian D2C shipping invoices. Upload a courier invoice (Shiproc
 
 The output is a total "money you can recover" figure, a filterable per-AWB issue table where every row expands to show its full working, and per-courier dispute CSVs and emails.
 
+**Payments:** an optional one-time Pro plan is sold through [Dodo Payments](https://dodopayments.com) Checkout Sessions (`/pricing`). Checkout never sees your audit files.
+
 **Privacy:** every file is parsed and audited in the browser. Nothing is uploaded, stored or sent anywhere. There's no backend, no database and no analytics, and a `connect-src 'self'` Content-Security-Policy makes the browser block any attempt to send data to another origin.
 
 **Accuracy:** all money maths is deterministic TypeScript in `lib/engine` (no LLM anywhere), rounded to paise at each step. The main acceptance test (`tests/e2e-sample.test.ts`) runs the full pipeline on sample data with 34 planted errors and asserts that exactly those are found, with nothing extra flagged.
@@ -46,7 +48,16 @@ npm run build:pincodes -- path/to/india_post.csv   # rebuild data/pincodes from 
 
 ## Deploy to Vercel
 
-The app is fully static (every route is prerendered) and needs **no environment variables**.
+Every page is prerendered. The only server code is the two Dodo Payments routes (`/api/checkout`, `/api/webhooks/dodo`). The audit works without any environment variables; checkout needs the ones below.
+
+### Checkout setup (Dodo Payments)
+
+1. In the Dodo dashboard, create a one-time product for Pro and copy its `pdt_…` id. Keep the price in sync with `lib/plans.ts` (display only).
+2. Create an API key, and a webhook pointing at `https://<your-domain>/api/webhooks/dodo`; copy its signing secret.
+3. Set the env vars from `.env.example` (in `.env.local` locally, or in Vercel → Project → Settings → Environment Variables):
+   `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `DODO_PRODUCT_ID_PRO`, and `DODO_PAYMENTS_ENVIRONMENT` (`test_mode` until you go live).
+
+The webhook verifies the signature and currently logs successful payments. There's no database yet, so wire fulfilment in `app/api/webhooks/dodo/route.ts` when you add one. The `/checkout/success` page only reflects the redirect status; it is not proof of payment.
 
 **Option A: Git integration (recommended)**
 1. Push this repo to GitHub.
@@ -65,6 +76,10 @@ vercel --prod     # production
 ```
 app/
   page.tsx                 landing (hero numbers come from a real build-time audit of the sample)
+  pricing/page.tsx         Free vs Pro, Pro button starts a Dodo checkout
+  checkout/success/        post-payment return page
+  api/checkout/            creates a Dodo Checkout Session (plan slug → allowlisted product id)
+  api/webhooks/dodo/       signature-verified Dodo webhook
   audit/page.tsx           4-step flow: invoice → orders → rate card → run
   audit/results/page.tsx   results, filters, exports, assumptions
 components/
@@ -123,4 +138,4 @@ When one AWB has several issues (e.g. wrong weight **and** wrong zone), the comp
 
 ## Out of scope (v1)
 
-No login, payments, database, PDF parsing (see the `lib/parsing/pdf.ts` interface and TODO), Shopify/courier API integrations, or automatic email sending.
+No login, database, Pro feature gating, PDF parsing (see the `lib/parsing/pdf.ts` interface and TODO), Shopify/courier API integrations, or automatic email sending.

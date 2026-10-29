@@ -20,6 +20,9 @@ export function SiteHeader() {
           <span className="hidden items-center gap-1.5 text-xs text-muted-foreground md:inline-flex">
             <Lock className="h-3.5 w-3.5" /> Files stay in your browser
           </span>
+          <Button asChild size="sm" variant="ghost" className="hidden sm:inline-flex">
+            <Link href="/pricing">Pricing</Link>
+          </Button>
           {inApp ? (
             <SettingsDrawer />
           ) : (
