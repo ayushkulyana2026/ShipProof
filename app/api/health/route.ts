@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const ctx = appContext();
+  const ctx = await appContext();
   return handleHealth({
     store: ctx.store,
     paymentsConfigured: ctx.env.paymentsConfigured,

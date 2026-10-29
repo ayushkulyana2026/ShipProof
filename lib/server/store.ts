@@ -41,7 +41,7 @@ export interface EventWriter {
 }
 
 export interface Store {
-  readonly kind: "postgres" | "memory";
+  readonly kind: "postgres" | "blob" | "memory";
   ping(): Promise<boolean>;
   createLead(lead: LeadInput): Promise<{ id: string }>;
   recordCheckout(s: { sessionId: string; email: string; plan: string }): Promise<void>;
@@ -197,22 +197,26 @@ export class MemoryStore implements Store {
   }
 }
 
-let store: Store | null | undefined;
+let store: Promise<Store | null> | undefined;
 
 /**
- * Postgres when DATABASE_URL is set. Without it, an in-memory store in
- * development only; in production there is no store (endpoints answer 503),
- * because serverless memory would silently lose data.
+ * Storage, in order of preference: Postgres (DATABASE_URL), Vercel Blob
+ * (BLOB_READ_WRITE_TOKEN, set automatically when a Blob store is connected to
+ * the project), in-memory in development only. In production with neither,
+ * there is no store and the endpoints that need one answer 503.
  */
-export function getStore(env: { DATABASE_URL?: string }): Store | null {
-  if (store !== undefined) return store;
-  if (env.DATABASE_URL) {
-    store = PostgresStore.fromUrl(env.DATABASE_URL);
-  } else if (process.env.NODE_ENV !== "production") {
-    console.warn("[shipproof] DATABASE_URL not set: using an in-memory store (development only, data is lost on restart).");
-    store = new MemoryStore();
-  } else {
-    store = null;
-  }
+export function getStore(env: { DATABASE_URL?: string; BLOB_READ_WRITE_TOKEN?: string }): Promise<Store | null> {
+  store ??= (async () => {
+    if (env.DATABASE_URL) return PostgresStore.fromUrl(env.DATABASE_URL);
+    if (env.BLOB_READ_WRITE_TOKEN) {
+      const { BlobStore, vercelBlobDocs } = await import("./blob-store");
+      return new BlobStore(await vercelBlobDocs(env.BLOB_READ_WRITE_TOKEN));
+    }
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[shipproof] No DATABASE_URL or BLOB_READ_WRITE_TOKEN: using an in-memory store (development only).");
+      return new MemoryStore();
+    }
+    return null;
+  })();
   return store;
 }

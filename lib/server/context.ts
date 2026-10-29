@@ -5,11 +5,11 @@ import { RateLimiter } from "./rate-limit";
 import { getStore } from "./store";
 
 /** Wires real dependencies for the route handlers (one instance per server process). */
-export function appContext() {
+export async function appContext() {
   const env = serverEnv();
   return {
     env,
-    store: getStore(env),
+    store: await getStore(env),
     createCheckout: env.paymentsConfigured ? dodoCheckout(env) : null,
     verify: env.DODO_PAYMENTS_WEBHOOK_KEY ? dodoWebhookVerifier(env.DODO_PAYMENTS_WEBHOOK_KEY) : null,
     allowedOrigin: env.APP_URL ? new URL(env.APP_URL).origin : undefined,

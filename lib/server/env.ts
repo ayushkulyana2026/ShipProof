@@ -8,6 +8,8 @@ import { z } from "zod";
  */
 const schema = z.object({
   DATABASE_URL: z.string().url().optional(),
+  /** Set by Vercel when a Blob store is connected to the project. */
+  BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
   DODO_PAYMENTS_API_KEY: z.string().min(1).optional(),
   DODO_PAYMENTS_WEBHOOK_KEY: z.string().min(1).optional(),
   DODO_PAYMENTS_ENVIRONMENT: z.enum(["test_mode", "live_mode"]).optional(),

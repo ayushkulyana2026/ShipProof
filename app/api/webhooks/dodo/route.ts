@@ -6,6 +6,6 @@ export const dynamic = "force-dynamic";
 
 /** Dodo Payments webhook endpoint. Configure in Dodo: Developer → Webhooks → https://<your-domain>/api/webhooks/dodo */
 export async function POST(req: Request) {
-  const ctx = appContext();
+  const ctx = await appContext();
   return handleDodoWebhook(req, { store: ctx.store, verify: ctx.verify });
 }

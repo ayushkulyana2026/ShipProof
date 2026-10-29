@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  const ctx = appContext();
+  const ctx = await appContext();
   return handleCheckout(req, {
     store: ctx.store,
     limiter: ctx.limiters.checkout,
