@@ -61,14 +61,14 @@ How it behaves:
 - **Missing config fails safely.** Each endpoint answers 503 with a clear message when its configuration is missing. The pricing section then falls back from checkout to a waitlist form, and webhooks fail closed (they're rejected rather than trusted).
 - **Test mode by default.** Dodo stays in `test_mode` unless `DODO_PAYMENTS_ENVIRONMENT=live_mode` is set explicitly, so a missing variable can't charge real cards.
 - **The redirect isn't proof of payment.** The checkout return page (`/checkout/success`) only shows a message; the webhook is what confirms a subscription.
-- **Storage is Postgres via `postgres`.** It uses one connection per instance, works with poolers, and creates its tables on first use or via `npm run db:migrate`. Without `DATABASE_URL`, development uses an in-memory store; production has no store and those endpoints return 503.
+- **Storage, in order of preference:** Postgres via `postgres` when `DATABASE_URL` is set (one connection per instance, works with poolers, tables created automatically or via `npm run db:migrate`). Otherwise a **Vercel Blob** store, used automatically when the project has `BLOB_READ_WRITE_TOKEN` (private JSON documents, conditional writes for concurrent updates). Otherwise in-memory in development only; production has no store and those endpoints return 503. **The live deployment uses the Blob store `shipproof-data`.**
 - **Rate limits are per instance.** On serverless that's best-effort, so add Vercel WAF rules for stronger limits.
 
 Code lives in `lib/server/` (env, store, Dodo, handlers, webhook event mapping) and `app/api/*/route.ts` (thin wrappers). Tests are in `tests/backend.test.ts`, plus `tests/postgres.test.ts` against a real database when `TEST_DATABASE_URL` is set.
 
 ### Turning the backend on (Vercel)
 
-1. **Database:** in the Vercel project go to **Storage → Create Database → Neon (Postgres)** and connect it. This sets `DATABASE_URL` for you.
+1. **Storage:** already done. A private Vercel Blob store (`shipproof-data`) is connected. To use Postgres instead, add Neon from Storage → Create Database; `DATABASE_URL` takes priority automatically.
 2. **Dodo Payments:** in the Dodo dashboard (test mode first), create a subscription product (e.g. ₹1,999/month) and copy its `pdt_…` ID. Create an API key, and add a webhook pointing to `https://<your-domain>/api/webhooks/dodo` with the `subscription.*` and `payment.*` events, then copy the signing secret.
 3. **Environment variables:** in Vercel go to **Settings → Environment Variables** and add `DODO_PAYMENTS_API_KEY`, `DODO_PAYMENTS_WEBHOOK_KEY`, `DODO_PRODUCT_ID_MONTHLY`, `DODO_PAYMENTS_ENVIRONMENT=test_mode` and `APP_URL`. Then redeploy.
 4. **Check:** open `/api/health`. It should show `database.status: "ok"`, `payments.configured: true` and `webhooks.configured: true`. Make a test-card purchase and check the `subscriptions` table.
